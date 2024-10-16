@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 
 const sellerSchema = new Schema({
     fullName: {
@@ -61,6 +61,10 @@ const sellerSchema = new Schema({
             type: String,
             required: true
         },
+    },
+    products:{
+        type:Schema.types.ObjectId,
+        ref:"Product"
     }
 
 
