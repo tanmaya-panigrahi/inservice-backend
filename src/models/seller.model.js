@@ -61,6 +61,10 @@ const sellerSchema = new Schema({
             type: String,
             required: true
         },
+    },
+    products:{
+        type:Schema.types.ObjectId,
+        ref:"Product"
     }
 
 
