@@ -62,10 +62,10 @@ const sellerSchema = new Schema({
             required: true
         },
     },
-    products:{
-        type:Schema.types.ObjectId,
-        ref:"Product"
-    }
+    // products:{
+    //     type:Schema.types.ObjectId,
+    //     ref:"Product"
+    // }
 
 
 }, { timestamps: true });

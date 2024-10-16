@@ -31,5 +31,9 @@ app.use("/api/v1/sellers", sellerRouter);
 //To explicitly convert any left over error to JSON format
 app.use(ApiErrorToJSON);
 
+app.get("/", (req, res) => {
+    res.send("Welcome to InService API");
+});
+
 export { app };
 
