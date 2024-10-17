@@ -43,11 +43,6 @@ const sellerSchema = new Schema({
         required: true,
         trim: true
     },
-    address: {
-        type: String,
-        required: true,
-        trim: true
-    },
     ratings: {
         type: Number,
         default: 0
@@ -62,6 +57,11 @@ const sellerSchema = new Schema({
             required: true
         },
     },
+    refreshToken: {
+        type: String,
+        default: ""
+    },
+
     // products:{
     //     type:Schema.types.ObjectId,
     //     ref:"Product"

@@ -1,20 +1,26 @@
 import { Seller } from "../models/seller.model.js";
+import { Buyer } from "../models/buyer.model.js";
 import { ApiError } from "./ApiError.js";
 
-const generateAccessAndRefreshToken = async (userId) => {
+const generateAccessAndRefreshToken = async (userId, Model) => {
     try {
-        const seller = await Seller.findById(userId);
+        // const seller = await Seller.findById(userId);
+        const user = await Model.findById(userId);
 
-        if (!seller) {
-            throw new ApiError(404, "Seller not found");
+        console.log("user", user);
+
+        if (!user) {
+            throw new ApiError(404, "User not found");
         };
         
-        const accessToken = await seller.generateAccessToken();
-        const refreshToken = await seller.generateRefreshToken();
+        const accessToken = await user.generateAccessToken();
+        const refreshToken = await user.generateRefreshToken();
+        // console.log("refreshToken", refreshToken);
+        // console.log("accessToken", accessToken);
 
-        seller.refreshToken = refreshToken;
-        await seller.save({ validateBeforeSave: false });
-
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
+        
         return { accessToken, refreshToken };
 
     } catch (error) {

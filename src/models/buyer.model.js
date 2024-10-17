@@ -29,6 +29,10 @@ const buyerSchema = new Schema({
         type: String,
         default: ""
     },
+    refreshToken: {
+        type: String,
+        default: ""
+    }
     // wishlist: {
     //     type: Schema.Types.ObjectId,
     //     ref: "Wishlist"
@@ -73,6 +77,22 @@ buyerSchema.methods.generateAccessToken = function () {
             expiresIn: process.env.ACCESS_TOKEN_EXPIRY
         }
     )
+}
+
+// Method to generate refresh token
+buyerSchema.methods.generateRefreshToken=function(){
+    return jwt.sign(
+        {
+            _id:this._id,
+            
+            
+        },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+        expiresIn:process.env.REFRESH_TOKEN_EXPIRY
+    }
+    )
+    
 }
 
 

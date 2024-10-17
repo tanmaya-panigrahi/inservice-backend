@@ -1,4 +1,5 @@
 import { Seller } from "../models/seller.model.js"; // Adjust the path as needed
+import { Buyer } from "../models/buyer.model.js"; // Adjust the path as needed
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -9,13 +10,19 @@ import { options } from "../constants.js";
 const registerSeller = asyncHandler(async (req, res) => {
     const { fullName, userName, email, password, storeName, storeDescription, phoneNo, address, location } = req.body;
 
-    // Check if seller with the same email or username already exists
+    // Check if seller  or buyer with the same email or username already exists
     const existingSeller = await Seller.findOne({
         $or: [{ email }, { userName }]
     });
 
-    if (existingSeller) {
-        throw new ApiError(409, "Seller with this email or username already exists");
+
+    const existingBuyer = await Buyer.findOne({
+        $or: [{ email }, { userName }]
+    });
+
+
+    if (existingBuyer || existingSeller) {
+        throw new ApiError(409, "User with this email or username already exists");
     }
 
     // // Handle avatar file upload (assuming file upload middleware is used, e.g., multer)
@@ -42,7 +49,6 @@ const registerSeller = asyncHandler(async (req, res) => {
         storeName,
         storeDescription,
         phoneNo,
-        address,
         location
     });
 
@@ -75,7 +81,9 @@ const loginSeller = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid email or password");
     }
 
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(seller._id);
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(seller._id, Seller);
+    // console.log("refreshToken", refreshToken);
+    // console.log("accessToken", accessToken);
 
     const loggedInSeller = await Seller.findById(seller._id).select("-password -refreshToken");
 
@@ -95,7 +103,7 @@ const loginSeller = asyncHandler(async (req, res) => {
 
 const logoutSeller = asyncHandler(async (req, res) => {
     const seller = await Seller.findByIdAndUpdate(
-        req.seller._id,
+        req.user._id,
         {
             $set: { refreshToken: undefined }
         },
