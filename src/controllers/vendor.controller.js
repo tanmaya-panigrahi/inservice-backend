@@ -1,27 +1,27 @@
-import { Seller } from "../models/seller.model.js"; // Adjust the path as needed
-import { Buyer } from "../models/buyer.model.js"; // Adjust the path as needed
+import { Vendor } from "../models/vendor.model.js"; // Adjust the path as needed
+import { Client } from "../models/client.model.js"; // Adjust the path as needed
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { generateAccessAndRefreshToken } from "../utils/generateTokens.js";
 import { options } from "../constants.js";
 
-// Register a new seller
-const registerSeller = asyncHandler(async (req, res) => {
-    const { fullName, userName, email, password, storeName, storeDescription, phoneNo, address, location } = req.body;
+// Register a new Vendor
+const registerVendor = asyncHandler(async (req, res) => {
+    const { fullName, userName, email, password,location, vendorStoreName, vendorDescription, phoneNo,ratings  } = req.body;
 
-    // Check if seller  or buyer with the same email or username already exists
-    const existingSeller = await Seller.findOne({
+    // Check if Vendor  or Client with the same email or username already exists
+    const existingVendor = await Vendor.findOne({
         $or: [{ email }, { userName }]
     });
 
 
-    const existingBuyer = await Buyer.findOne({
+    const existingClient = await Client.findOne({
         $or: [{ email }, { userName }]
     });
 
 
-    if (existingBuyer || existingSeller) {
+    if (existingClient || existingVendor) {
         throw new ApiError(409, "User with this email or username already exists");
     }
 
@@ -40,52 +40,53 @@ const registerSeller = asyncHandler(async (req, res) => {
     //     throw new ApiError(400, "Avatar upload failed");
     // }
 
-    // Create a new seller instance
-    const seller = await Seller.create({
+    // Create a new Vendor instance
+    const vendor = await Vendor.create({
         fullName,
         userName: userName.toLowerCase(),
         email,
         password,
-        storeName,
-        storeDescription,
+        location,
+        vendorStoreName,
+        vendorDescription,
         phoneNo,
-        location
+        ratings
     });
 
-    // Retrieve created seller without sensitive fields
-    const createdSeller = await Seller.findById(seller._id).select("-password");
+    // Retrieve created Vendor without sensitive fields
+    const createdVendor = await Vendor.findById(vendor._id).select("-password");
 
-    if (!createdSeller) {
-        throw new ApiError(500, "Seller registration failed");
+    if (!createdVendor) {
+        throw new ApiError(500, "Vendor registration failed");
     } else {
-        res.status(201).json(new ApiResponse(201, createdSeller, "Seller registered successfully"));
+        res.status(201).json(new ApiResponse(201, createdVendor, "Vendor registered successfully"));
     }
 });
 
-const loginSeller = asyncHandler(async (req, res) => {
+const loginVendor = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
         throw new ApiError(400, "Email and password are required.");
     }
 
-    const seller = await Seller.findOne({ email });
+    const vendor = await Vendor.findOne({ email });
 
-    if (!seller) {
-        throw new ApiError(400, "Seller does not exist. Please register.")
+    if (!vendor) {
+        throw new ApiError(400, "Vendor does not exist. Please register.")
     }
 
-    const isPasswordValid = await seller.isPasswordCorrect(password);
+    const isPasswordValid = await vendor.isPasswordCorrect(password);
 
     if (!isPasswordValid) {
         throw new ApiError(400, "Invalid email or password");
     }
 
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(seller._id, Seller);
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(vendor._id, Vendor);
     // console.log("refreshToken", refreshToken);
     // console.log("accessToken", accessToken);
 
-    const loggedInSeller = await Seller.findById(seller._id).select("-password -refreshToken");
+    const loggedInVendor = await Vendor.findById(vendor._id).select("-password -refreshToken");
 
     return res.status(200)
         .cookie("accessToken", accessToken, options)
@@ -93,7 +94,7 @@ const loginSeller = asyncHandler(async (req, res) => {
         .json(new ApiResponse(
             200,
             {
-                seller: loggedInSeller,
+                vendor: loggedInVendor,
                 accessToken,
                 refreshToken
             },
@@ -101,11 +102,11 @@ const loginSeller = asyncHandler(async (req, res) => {
         ));
 });
 
-const logoutSeller = asyncHandler(async (req, res) => {
-    const seller = await Seller.findByIdAndUpdate(
+const logoutVendor = asyncHandler(async (req, res) => {
+    const vendor = await Vendor.findByIdAndUpdate(
         req.user._id,
         {
-            $set: { refreshToken: undefined }
+            $set: { refreshToken: "" }
         },
         { new: true } //Return the updated document
     );
@@ -120,4 +121,4 @@ const logoutSeller = asyncHandler(async (req, res) => {
         ));
 });
 
-export { registerSeller, loginSeller, logoutSeller };
+export { registerVendor, loginVendor, logoutVendor };

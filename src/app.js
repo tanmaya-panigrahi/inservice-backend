@@ -26,14 +26,14 @@ app.use(cookieParser());
 
 // Handling routers
 
-// seller router
-import { sellerRouter } from "./routes/seller.route.js";
-app.use("/api/v1/sellers", sellerRouter);
+// vendor router
+import { vendorRouter } from "./routes/vendor.route.js";
+app.use("/api/v1/vendors", vendorRouter);
 
 
-// buyer router
-import { buyerRouter } from "./routes/buyer.route.js";
-app.use("/api/v1/buyers", buyerRouter);
+// client router
+import { clientRouter } from "./routes/client.route.js";
+app.use("/api/v1/clients", clientRouter);
 
 //To explicitly convert any left over error to JSON format
 app.use(ApiErrorToJSON);

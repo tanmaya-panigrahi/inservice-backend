@@ -1,10 +1,10 @@
-import { Seller } from "../models/seller.model.js";
-import { Buyer } from "../models/buyer.model.js";
+import { Vendor } from "../models/vendor.model.js";
+import { Client } from "../models/client.model.js";
 import { ApiError } from "./ApiError.js";
 
 const generateAccessAndRefreshToken = async (userId, Model) => {
     try {
-        // const seller = await Seller.findById(userId);
+        
         const user = await Model.findById(userId);
 
         console.log("user", user);

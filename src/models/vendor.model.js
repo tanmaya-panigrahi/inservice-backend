@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-const sellerSchema = new Schema({
+const vendorSchema = new Schema({
     fullName: {
         type: String,
         required: true,
@@ -25,18 +25,30 @@ const sellerSchema = new Schema({
         type: String,
         required: true
     },
-    storeName: {
+    avatar: {
+        type: String,
+        default: ""
+    },
+    location: {
+        type: String,
+        required: true, // Used to display relevant service requests and recommendations
+    },
+    // services: [{
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Service', // References the services offered by the provider
+    // }],
+    // ongoingRequests: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'ServiceRequest', // References the ongoing requests related to this provider
+    // },
+    vendorStoreName: {
         type: String,
         required: true,
         trim: true
     },
-    storeDescription: {
+    vendorDescription: {
         type: String,
         trim: true
-    },
-    avatar: {
-        type: String,
-        default: ""
     },
     phoneNo: {
         type: String,
@@ -47,32 +59,18 @@ const sellerSchema = new Schema({
         type: Number,
         default: 0
     },
-    location: {
-        country: {
-            type: String,
-            required: true
-        },
-        address: {
-            type: String,
-            required: true
-        },
-    },
+
     refreshToken: {
         type: String,
         default: ""
     },
-
-    // products:{
-    //     type:Schema.types.ObjectId,
-    //     ref:"Product"
-    // }
 
 
 }, { timestamps: true });
 
 
 // Hash password before saving
-sellerSchema.pre('save', async function (next) {
+vendorSchema.pre('save', async function (next) {
     if (this.isModified('password')) {
         this.password = await bcrypt.hash(this.password, 10);
     }
@@ -81,13 +79,13 @@ sellerSchema.pre('save', async function (next) {
 
 
 // Method to check password validity
-sellerSchema.methods.isPasswordCorrect = async function (password) {
+vendorSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
 
 
 // methodod to generate access token
-sellerSchema.methods.generateAccessToken = function () {
+vendorSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {
             _id: this._id,
@@ -103,21 +101,21 @@ sellerSchema.methods.generateAccessToken = function () {
 }
 
 // method to generate refresh token
-sellerSchema.methods.generateRefreshToken=function(){
+vendorSchema.methods.generateRefreshToken = function () {
     return jwt.sign(
         {
-            _id:this._id,
-            
-            
+            _id: this._id,
+
+
         },
-    process.env.REFRESH_TOKEN_SECRET,
-    {
-        expiresIn:process.env.REFRESH_TOKEN_EXPIRY
-    }
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
     )
-    
+
 }
 
 
-// export the seller model
-export const Seller = mongoose.model("Seller", sellerSchema);
+// export the vendor model
+export const Vendor = mongoose.model("Vendor", vendorSchema);

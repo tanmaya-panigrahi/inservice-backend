@@ -1,8 +1,8 @@
 import validator from "validator";
 import { ApiError } from "../utils/ApiError.js";
 
-// Validate buyer data
-const validateBuyer = (req, res, next) => {
+// Validate vendor data
+const validateVendor = (req, res, next) => {
     const data = req.body;
     let errors = {};
 
@@ -27,22 +27,47 @@ const validateBuyer = (req, res, next) => {
         errors.email = 'Invalid email address';
     }
 
-    // Validate password (minimum length 8, at least one uppercase letter, number, and special character)
+    // Validate password
     if (!data.password || validator.isEmpty(data.password)) {
         errors.password = 'Password is required';
     } else if (!validator.isStrongPassword(data.password, {
         minLength: 8,
-        minLowercase: 0,  // No strict requirement for lowercase
-        minUppercase: 1,  // At least 1 uppercase letter
-        minNumbers: 1,    // At least 1 number
-        minSymbols: 1     // At least 1 special character
+        minLowercase: 0,     // You don't need to enforce lowercase
+        minUppercase: 1,     // At least 1 uppercase letter
+        minNumbers: 1,       // At least 1 digit
+        minSymbols: 1,       // At least 1 special character
     })) {
         errors.password = 'Password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character';
     }
 
+    // Validate location
+    if (!data.location || validator.isEmpty(data.location.trim())) {
+        errors.location = 'Location is required';
+    }
+
+    // Validate store name
+    if (!data.vendorStoreName || validator.isEmpty(data.vendorStoreName.trim())) {
+        errors.vendorStoreName = 'Store name is required';
+    }
+
+    // Validate phone number (assuming it's a 10-digit number)
+    if (!data.phoneNo || validator.isEmpty(data.phoneNo.trim())) {
+        errors.phoneNo = 'Phone number is required';
+    } else if (!validator.isMobilePhone(data.phoneNo.trim(), 'any', { strictMode: false })) {
+        errors.phoneNo = 'Invalid phone number';
+    }
 
 
+
+    
     // Check if there are any errors
+    // if (Object.keys(errors).length > 0) {
+    //     return res.status(400).json({
+    //         success: false,
+    //         message : errors[Object.keys(errors)[0]],
+    //     });
+    // }
+    
     if (Object.keys(errors).length > 0) {
        throw new ApiError(400, errors[Object.keys(errors)[0]]);
     }
@@ -51,4 +76,4 @@ const validateBuyer = (req, res, next) => {
     next();
 };
 
-export { validateBuyer };
+export { validateVendor };
