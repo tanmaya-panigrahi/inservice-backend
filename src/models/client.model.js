@@ -34,10 +34,10 @@ const clientSchema = new Schema({
         default: "",
         required:true
     },
-    // requests:{
-    //     type:Schema.Types.ObjectId,
-    //     ref:"Request"
-    // },
+    requests:[{
+        type:Schema.Types.ObjectId,
+        ref:"Request"
+    }],
     refreshToken: {
         type: String,
         default: ""

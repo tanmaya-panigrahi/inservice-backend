@@ -1,5 +1,6 @@
 import { Client } from '../models/client.model.js';
 import { Vendor } from '../models/vendor.model.js';
+import { Request } from '../models/request.model.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
@@ -111,5 +112,43 @@ const logoutClient= asyncHandler(async (req, res) => {
 });
 
 
-export { registerClient, loginClient ,logoutClient};
+const requestCreation=asyncHandler(async(req,res)=>{
+
+    const {requestTitle,requestDescription,requestImage,status,category,budget,attachments}=req.body;
+    const clientId=req.user._id;
+    const vendorId=null;
+
+    const request=await Request.create({
+        requestTitle,
+        requestDescription,
+        requestImage,
+        clientId,
+        vendorId,
+        status,
+        category,
+        budget,
+        attachments
+    });
+
+
+     // Now, add the request ID to the client's `requests` array
+     await Client.findByIdAndUpdate(clientId, {
+        $push: { requests: request._id }  // Push the new request's ID to the `requests` array
+    });
+
+    if(!request){
+        throw new ApiError(500,"Request creation failed");
+    }
+    else{
+        res.status(201).json(new ApiResponse(201,request,"Request created successfully"));
+    }
+
+
+
+
+    
+    
+})
+
+export { registerClient, loginClient ,logoutClient,requestCreation};
 
