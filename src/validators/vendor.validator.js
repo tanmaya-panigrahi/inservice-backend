@@ -1,8 +1,8 @@
 import validator from "validator";
 import { ApiError } from "../utils/ApiError.js";
 
-// Validate seller data
-const validateSeller = (req, res, next) => {
+// Validate vendor data
+const validateVendor = (req, res, next) => {
     const data = req.body;
     let errors = {};
 
@@ -40,6 +40,16 @@ const validateSeller = (req, res, next) => {
         errors.password = 'Password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character';
     }
 
+    // Validate location
+    if (!data.location || validator.isEmpty(data.location.trim())) {
+        errors.location = 'Location is required';
+    }
+
+    // Validate store name
+    if (!data.vendorStoreName || validator.isEmpty(data.vendorStoreName.trim())) {
+        errors.vendorStoreName = 'Store name is required';
+    }
+
     // Validate phone number (assuming it's a 10-digit number)
     if (!data.phoneNo || validator.isEmpty(data.phoneNo.trim())) {
         errors.phoneNo = 'Phone number is required';
@@ -47,26 +57,9 @@ const validateSeller = (req, res, next) => {
         errors.phoneNo = 'Invalid phone number';
     }
 
-    // Validate address
-    if (!data.address || validator.isEmpty(data.address.trim())) {
-        errors.address = 'Address is required';
-    }
 
-    // Validate store name
-    if (!data.storeName || validator.isEmpty(data.storeName.trim())) {
-        errors.storeName = 'Store name is required';
-    }
 
-    // Validate country inside location
-    if (!data.location || !data.location.country || validator.isEmpty(data.location.country.trim())) {
-        errors.country = 'Country is required';
-    }
-
-    // Validate address inside location
-    if (!data.location || !data.location.address || validator.isEmpty(data.location.address.trim())) {
-        errors.locationAddress = 'Location address is required';
-    }
-
+    
     // Check if there are any errors
     // if (Object.keys(errors).length > 0) {
     //     return res.status(400).json({
@@ -83,4 +76,4 @@ const validateSeller = (req, res, next) => {
     next();
 };
 
-export { validateSeller };
+export { validateVendor };

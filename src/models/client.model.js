@@ -2,8 +2,8 @@ import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-// creating the buyer registration schema
-const buyerSchema = new Schema({
+// creating the client registration schema
+const clientSchema = new Schema({
     fullName: {
         type: String,
         required: true,
@@ -20,7 +20,7 @@ const buyerSchema = new Schema({
         required: true,
         unique: true,
         trim: true
-    },  
+    },
     password: {
         type: String,
         required: true
@@ -29,23 +29,25 @@ const buyerSchema = new Schema({
         type: String,
         default: ""
     },
-    // wishlist: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Wishlist"
-    // },
-    // cart: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Cart"
-    // },
-    // orderHistory: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: "OrderHistory"
-    // }
+    location:{
+        type: String,
+        default: "",
+        required:true
+    },
+    requests:[{
+        type:Schema.Types.ObjectId,
+        ref:"Request"
+    }],
+    refreshToken: {
+        type: String,
+        default: ""
+    }
+
 
 }, { timestamps: true });
 
-// hashing the password before saving the buyer registration details
-buyerSchema.pre("save", async function (next) {
+// hashing the password before saving the client registration details
+clientSchema.pre("save", async function (next) {
     if (this.isModified("password")) {
         this.password = await bcrypt.hash(this.password, 10);
     }
@@ -54,13 +56,13 @@ buyerSchema.pre("save", async function (next) {
 
 
 // Method to check password
-buyerSchema.methods.isPasswordCorrect = async function (password) {
+clientSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
 
 
 // Method to generate acccess token
-buyerSchema.methods.generateAccessToken = function () {
+clientSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {
             _id: this._id,
@@ -75,6 +77,22 @@ buyerSchema.methods.generateAccessToken = function () {
     )
 }
 
+// Method to generate refresh token
+clientSchema.methods.generateRefreshToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
 
-// exporting the buyer registration model
-export const Buyer = mongoose.model("Buyer", buyerSchema);
+
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )
+
+}
+
+
+// exporting the client registration model
+export const Client = mongoose.model("Client", clientSchema);
