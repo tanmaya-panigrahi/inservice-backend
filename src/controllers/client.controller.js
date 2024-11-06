@@ -10,29 +10,24 @@ import { options } from '../constants.js';
 
 // Register a new client
 const registerClient = asyncHandler(async (req, res) => {
-    const { fullName, userName, email, password,location } = req.body;
+    const { fullName, email, password } = req.body.data;
 
     // Check if client or Vendor  with the same email or username already exists
-    const existingClient = await Client.findOne({
-        $or: [{ email }, { userName }]
-    });
+    const existingClient = await Client.findOne({ email});
 
-    const existingVendor = await Vendor.findOne({
-        $or: [{ email }, { userName }]
-    });
+    const existingVendor = await Vendor.findOne({email});
 
     if (existingClient || existingVendor) {
-        throw new ApiError(409, "User with this email or username already exists");
+        throw new ApiError(409, "User with this email  already exists");
     }
 
 
     // Create a new client instance
     const client = await Client.create({
         fullName,
-        userName: userName.toLowerCase(),
         email,
         password,
-        location
+       
     })
 
 
@@ -50,7 +45,7 @@ const registerClient = asyncHandler(async (req, res) => {
 
 
 const loginClient = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password } = req.body.data;
 
     if (!email || !password) {
         throw new ApiError(400, "Email and password are required.");
@@ -96,7 +91,7 @@ const loginClient = asyncHandler(async (req, res) => {
 });
 
 
-const logoutClient= asyncHandler(async (req, res) => {
+const logoutClient = asyncHandler(async (req, res) => {
     const client = await Client.findByIdAndUpdate(
         req.user._id,
         {
@@ -112,13 +107,13 @@ const logoutClient= asyncHandler(async (req, res) => {
 });
 
 
-const requestCreation=asyncHandler(async(req,res)=>{
+const requestCreation = asyncHandler(async (req, res) => {
 
-    const {requestTitle,requestDescription,requestImage,status,category,budget,attachments}=req.body;
-    const clientId=req.user._id;
-    const vendorId=null;
+    const { requestTitle, requestDescription, requestImage, status, category, budget, attachments } = req.body;
+    const clientId = req.user._id;
+    const vendorId = null;
 
-    const request=await Request.create({
+    const request = await Request.create({
         requestTitle,
         requestDescription,
         requestImage,
@@ -131,24 +126,51 @@ const requestCreation=asyncHandler(async(req,res)=>{
     });
 
 
-     // Now, add the request ID to the client's `requests` array
-     await Client.findByIdAndUpdate(clientId, {
+    // Now, add the request ID to the client's `requests` array
+    await Client.findByIdAndUpdate(clientId, {
         $push: { requests: request._id }  // Push the new request's ID to the `requests` array
     });
 
-    if(!request){
-        throw new ApiError(500,"Request creation failed");
+    if (!request) {
+        throw new ApiError(500, "Request creation failed");
     }
-    else{
-        res.status(201).json(new ApiResponse(201,request,"Request created successfully"));
+    else {
+        res.status(201).json(new ApiResponse(201, request, "Request created successfully"));
     }
 
 
 
 
-    
-    
+
+
 })
 
-export { registerClient, loginClient ,logoutClient,requestCreation};
+
+
+const requestUpdation = asyncHandler(async (req, res) => {
+    const requestId = req.params.id;
+    const { requestTitle, requestDescription, requestImage, status, category, budget, attachments } = req.body;
+
+    const request = await Request.findByIdAndUpdate
+        (requestId, {
+            requestTitle,
+            requestDescription,
+            requestImage,
+            status,
+            category,
+            budget,
+            attachments
+        }, { new: true });
+
+    if (!request) {
+        throw new ApiError(500, "Request updation failed");
+    }
+    else {
+        res.status(200).json(new ApiResponse(200, request, "Request updated successfully"));
+    }
+
+
+})
+
+export { registerClient, loginClient, logoutClient, requestCreation };
 

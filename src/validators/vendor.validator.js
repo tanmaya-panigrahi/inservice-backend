@@ -11,15 +11,6 @@ const validateVendor = (req, res, next) => {
         errors.fullName = 'Full name is required';
     }
 
-    // Validate username (required, alphanumeric, minimum length of 3)
-    if (!data.userName || validator.isEmpty(data.userName.trim())) {
-        errors.userName = 'Username is required';
-    } else if (!validator.isAlphanumeric(data.userName.trim())) {
-        errors.userName = 'Username must be alphanumeric';
-    } else if (!validator.isLength(data.userName.trim(), { min: 3 })) {
-        errors.userName = 'Username must be at least 3 characters long';
-    }
-
     // Validate email
     if (!data.email || validator.isEmpty(data.email.trim())) {
         errors.email = 'Email is required';
@@ -40,14 +31,14 @@ const validateVendor = (req, res, next) => {
         errors.password = 'Password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character';
     }
 
-    // Validate location
-    if (!data.location || validator.isEmpty(data.location.trim())) {
-        errors.location = 'Location is required';
+    // Validate address
+    if (!data.address || validator.isEmpty(data.address.trim())) {
+        errors.address = 'Address is required';
     }
 
-    // Validate store name
-    if (!data.vendorStoreName || validator.isEmpty(data.vendorStoreName.trim())) {
-        errors.vendorStoreName = 'Store name is required';
+    // Validate vendor service name
+    if (!data.vendorServiceName || validator.isEmpty(data.vendorServiceName.trim())) {
+        errors.vendorServiceName = 'Vendor service name is required';
     }
 
     // Validate phone number (assuming it's a 10-digit number)
@@ -57,19 +48,14 @@ const validateVendor = (req, res, next) => {
         errors.phoneNo = 'Invalid phone number';
     }
 
+    // Validate category
+    if (!data.category || validator.isEmpty(data.category.trim())) {
+        errors.category = 'Category is required';
+    }
 
-
-    
     // Check if there are any errors
-    // if (Object.keys(errors).length > 0) {
-    //     return res.status(400).json({
-    //         success: false,
-    //         message : errors[Object.keys(errors)[0]],
-    //     });
-    // }
-    
     if (Object.keys(errors).length > 0) {
-       throw new ApiError(400, errors[Object.keys(errors)[0]]);
+        throw new ApiError(400, errors[Object.keys(errors)[0]]);
     }
 
     // No errors, proceed to next middleware

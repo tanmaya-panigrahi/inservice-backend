@@ -8,13 +8,6 @@ const vendorSchema = new Schema({
         required: true,
         trim: true
     },
-    userName: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
-
-    },
     email: {
         type: String,
         required: true,
@@ -29,7 +22,7 @@ const vendorSchema = new Schema({
         type: String,
         default: ""
     },
-    location: {
+    address: {
         type: String,
         required: true, // Used to display relevant service requests and recommendations
     },
@@ -41,7 +34,7 @@ const vendorSchema = new Schema({
     //     type: mongoose.Schema.Types.ObjectId,
     //     ref: 'ServiceRequest', // References the ongoing requests related to this provider
     // },
-    vendorStoreName: {
+    vendorServiceName: {
         type: String,
         required: true,
         trim: true
@@ -51,6 +44,11 @@ const vendorSchema = new Schema({
         trim: true
     },
     phoneNo: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    category:{
         type: String,
         required: true,
         trim: true

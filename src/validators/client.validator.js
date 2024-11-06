@@ -11,14 +11,6 @@ const validateClient = (req, res, next) => {
         errors.fullName = 'Full name is required';
     }
 
-    // Validate username (required, alphanumeric, minimum length of 3)
-    if (!data.userName || validator.isEmpty(data.userName.trim())) {
-        errors.userName = 'Username is required';
-    } else if (!validator.isAlphanumeric(data.userName.trim())) {
-        errors.userName = 'Username must be alphanumeric';
-    } else if (!validator.isLength(data.userName.trim(), { min: 3 })) {
-        errors.userName = 'Username must be at least 3 characters long';
-    }
 
     // Validate email
     if (!data.email || validator.isEmpty(data.email.trim())) {
@@ -41,11 +33,7 @@ const validateClient = (req, res, next) => {
     }
 
 
-    // Validate location
-    if (!data.location || validator.isEmpty(data.location.trim())) {
-        errors.location = 'Location is required';
-    }
-    
+
 
 
 
