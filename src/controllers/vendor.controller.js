@@ -8,21 +8,17 @@ import { options } from "../constants.js";
 
 // Register a new Vendor
 const registerVendor = asyncHandler(async (req, res) => {
-    const { fullName, userName, email, password,location, vendorStoreName, vendorDescription, phoneNo,ratings  } = req.body;
+    const { fullName, email, password,address, vendorServiceName, vendorDescription, phoneNo,category,ratings  } = req.body.data;
 
     // Check if Vendor  or Client with the same email or username already exists
-    const existingVendor = await Vendor.findOne({
-        $or: [{ email }, { userName }]
-    });
+    const existingVendor = await Vendor.findOne({email});
 
 
-    const existingClient = await Client.findOne({
-        $or: [{ email }, { userName }]
-    });
+    const existingClient = await Client.findOne({email});
 
 
     if (existingClient || existingVendor) {
-        throw new ApiError(409, "User with this email or username already exists");
+        throw new ApiError(409, "User with this email  already exists");
     }
 
     // // Handle avatar file upload (assuming file upload middleware is used, e.g., multer)
@@ -43,13 +39,13 @@ const registerVendor = asyncHandler(async (req, res) => {
     // Create a new Vendor instance
     const vendor = await Vendor.create({
         fullName,
-        userName: userName.toLowerCase(),
         email,
         password,
-        location,
-        vendorStoreName,
+        address,
+        vendorServiceName,
         vendorDescription,
         phoneNo,
+        category,
         ratings
     });
 
@@ -64,7 +60,7 @@ const registerVendor = asyncHandler(async (req, res) => {
 });
 
 const loginVendor = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password } = req.body.data;
 
     if (!email || !password) {
         throw new ApiError(400, "Email and password are required.");

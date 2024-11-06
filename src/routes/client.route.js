@@ -7,6 +7,11 @@ import { Client } from "../models/client.model.js";
 
 const clientRouter = Router();
 
+
+// landing page route - GET
+
+
+
 //Register a new client - POST
 clientRouter.route("/register").post(
     validateClient,
