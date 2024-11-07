@@ -8,7 +8,7 @@ const vendorRouter = Router();
 
 //Register a new vendor - POST
 vendorRouter.route("/register").post(
-    validateVendor,
+    // validateVendor,
     registerVendor
 );
 
