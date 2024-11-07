@@ -34,16 +34,16 @@ const vendorSchema = new Schema({
     //     type: mongoose.Schema.Types.ObjectId,
     //     ref: 'ServiceRequest', // References the ongoing requests related to this provider
     // },
-    vendorServiceName: {
+    serviceName: {
         type: String,
         required: true,
         trim: true
     },
-    vendorDescription: {
+    serviceDescription: {
         type: String,
         trim: true
     },
-    phoneNo: {
+    phone: {
         type: String,
         required: true,
         trim: true

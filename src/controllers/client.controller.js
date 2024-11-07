@@ -10,15 +10,18 @@ import { options } from '../constants.js';
 
 // Register a new client
 const registerClient = asyncHandler(async (req, res) => {
-    const { fullName, email, password } = req.body.data;
+
+    console.log(req.body.filteredData);
+
+    const { fullName, email, password } = req.body.filteredData;
 
     // Check if client or Vendor  with the same email or username already exists
-    const existingClient = await Client.findOne({ email});
+    const existingClient = await Client.findOne({email});
 
     const existingVendor = await Vendor.findOne({email});
 
     if (existingClient || existingVendor) {
-        throw new ApiError(409, "User with this email  already exists");
+        throw new ApiError(409, "User with this email already exists");
     }
 
 
@@ -29,7 +32,6 @@ const registerClient = asyncHandler(async (req, res) => {
         password,
        
     })
-
 
     // Retrieve created client without sensitive fields
     const createdClient = await Client.findById(client._id).select("-password");

@@ -14,7 +14,7 @@ const clientRouter = Router();
 
 //Register a new client - POST
 clientRouter.route("/register").post(
-    validateClient,
+    // validateClient,
     registerClient
 );
 

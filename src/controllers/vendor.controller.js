@@ -8,17 +8,17 @@ import { options } from "../constants.js";
 
 // Register a new Vendor
 const registerVendor = asyncHandler(async (req, res) => {
-    const { fullName, email, password,address, vendorServiceName, vendorDescription, phoneNo,category,ratings  } = req.body.data;
+    // console.log(req.body.filteredData);
+    console.log(req.body.filteredData);
+    const { fullName, email, password, address, serviceName, serviceDescription, phone , category, ratings } = req.body.filteredData;
 
     // Check if Vendor  or Client with the same email or username already exists
     const existingVendor = await Vendor.findOne({email});
 
-
     const existingClient = await Client.findOne({email});
 
-
     if (existingClient || existingVendor) {
-        throw new ApiError(409, "User with this email  already exists");
+        throw new ApiError(409, "User with this email already exists");
     }
 
     // // Handle avatar file upload (assuming file upload middleware is used, e.g., multer)
@@ -42,9 +42,9 @@ const registerVendor = asyncHandler(async (req, res) => {
         email,
         password,
         address,
-        vendorServiceName,
-        vendorDescription,
-        phoneNo,
+        serviceName,
+        serviceDescription,
+        phone,
         category,
         ratings
     });
@@ -60,7 +60,7 @@ const registerVendor = asyncHandler(async (req, res) => {
 });
 
 const loginVendor = asyncHandler(async (req, res) => {
-    const { email, password } = req.body.data;
+    const { email, password } = req.body.filteredData;
 
     if (!email || !password) {
         throw new ApiError(400, "Email and password are required.");
