@@ -6,6 +6,7 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { generateAccessAndRefreshToken } from '../utils/generateTokens.js';
 import { options } from '../constants.js';
+import pusher from '../utils/pusher.js';
 
 
 // Register a new client
@@ -18,7 +19,7 @@ const registerClient = asyncHandler(async (req, res) => {
     // Check if client or Vendor  with the same email or username already exists
     const existingClient = await Client.findOne({email});
 
-    const existingVendor = await Vendor.findOne({email});
+    const existingVendor = await Vendor.findOne({ email });
 
     if (existingClient || existingVendor) {
         throw new ApiError(409, "User with this email already exists");
@@ -30,7 +31,7 @@ const registerClient = asyncHandler(async (req, res) => {
         fullName,
         email,
         password,
-       
+
     })
 
     // Retrieve created client without sensitive fields
@@ -40,20 +41,22 @@ const registerClient = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Client registration failed");
     }
     else {
-        res.status(201).json(new ApiResponse(201, createdClient, "Client registered successfully"));
+        return res.status(201).json(new ApiResponse(201, createdClient, "Client registered successfully"));
     }
 
 })
 
 
 const loginClient = asyncHandler(async (req, res) => {
-    const { email, password } = req.body.data;
+    const { email, password } = req.body.filteredData;
 
     if (!email || !password) {
         throw new ApiError(400, "Email and password are required.");
     }
 
     const client = await Client.findOne({ email });
+
+   
 
     if (!client) {
         throw new ApiError(404, "Client does not exist. Please register.");
@@ -71,11 +74,11 @@ const loginClient = asyncHandler(async (req, res) => {
     const loggedInClient = await Client.findById(client._id).select("-password -refreshToken");
 
 
-    return res.status(200)
+    return res.status(201)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(new ApiResponse(
-            200,
+            201,
             {
                 client: loggedInClient,
                 accessToken,
@@ -111,21 +114,25 @@ const logoutClient = asyncHandler(async (req, res) => {
 
 const requestCreation = asyncHandler(async (req, res) => {
 
-    const { requestTitle, requestDescription, requestImage, status, category, budget, attachments } = req.body;
-    const clientId = req.user._id;
-    const vendorId = null;
+    const { contractTitle, contractDescription, paymentType, hourlyRate, fixedPrice, startDate, requestImage, vendorId, status } = req.body;
+    const clientId ="64a7b9f1f1d2b4a3c8e5e9d1";
+
+
 
     const request = await Request.create({
-        requestTitle,
-        requestDescription,
+        contractTitle,
+        contractDescription,
+        paymentType,
+        hourlyRate,
+        fixedPrice,
+        startDate,
         requestImage,
         clientId,
         vendorId,
-        status,
-        category,
-        budget,
-        attachments
+        status
     });
+
+    
 
 
     // Now, add the request ID to the client's `requests` array
@@ -133,10 +140,30 @@ const requestCreation = asyncHandler(async (req, res) => {
         $push: { requests: request._id }  // Push the new request's ID to the `requests` array
     });
 
+    // Now, add the request ID to the vendor's `requestReceived` array
+    await Vendor.findByIdAndUpdate(vendorId, {
+        $push: { requestReceived: request._id }  // Push the new request's ID to the `requestReceived` array
+    });
+
     if (!request) {
         throw new ApiError(500, "Request creation failed");
     }
     else {
+        pusher.trigger('requests', 'new-request', {
+            requestId: request._id,
+            clientId: request.clientId,
+            vendorId: request.vendorId,
+            contractTitle: request.contractTitle,
+            contractDescription: request.contractDescription,
+            paymentType: request.paymentType,
+            hourlyRate: request.hourlyRate,
+            fixedPrice: request.fixedPrice,
+            startDate: request.startDate,
+            requestImage: request.requestImage,
+            status: request.status,
+            
+        });
+        
         res.status(201).json(new ApiResponse(201, request, "Request created successfully"));
     }
 

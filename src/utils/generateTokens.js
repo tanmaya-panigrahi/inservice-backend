@@ -7,7 +7,7 @@ const generateAccessAndRefreshToken = async (userId, Model) => {
         
         const user = await Model.findById(userId);
 
-        console.log("user", user);
+        // console.log("user", user);
 
         if (!user) {
             throw new ApiError(404, "User not found");
