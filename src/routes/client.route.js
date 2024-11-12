@@ -13,8 +13,7 @@ const clientRouter = Router();
 
 
 //Register a new client - POST
-clientRouter.route("/register").post(
-    // validateClient,
+clientRouter.route("/signup").post(
     registerClient
 );
 
@@ -33,9 +32,9 @@ clientRouter.route("/logout").post(
 
 // request by the client - POST
 
-clientRouter.route("/request").post(
-    verifyJWT(Client),
-    validateRequest,
+clientRouter.route("/hire").post(
+    // verifyJWT(Client),
+    // validateRequest,
     requestCreation
 );  
 

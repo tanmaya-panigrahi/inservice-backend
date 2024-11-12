@@ -84,11 +84,11 @@ const loginVendor = asyncHandler(async (req, res) => {
 
     const loggedInVendor = await Vendor.findById(vendor._id).select("-password -refreshToken");
 
-    return res.status(200)
+    return res.status(201)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(new ApiResponse(
-            200,
+            201,
             {
                 vendor: loggedInVendor,
                 accessToken,

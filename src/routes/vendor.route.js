@@ -7,13 +7,14 @@ import { Vendor } from "../models/vendor.model.js";
 const vendorRouter = Router();
 
 //Register a new vendor - POST
-vendorRouter.route("/register").post(
-    // validateVendor,
+vendorRouter.route("/signup").post(
+    
     registerVendor
 );
 
 //Login a vendor - POST
 vendorRouter.route("/login").post(
+    
     loginVendor
 );
 

@@ -4,15 +4,32 @@ import mongoose,{Schema} from "mongoose";
 
 
 const requestSchema=new Schema({
-    requestTitle:{
+    contractTitle:{
         type:String,
         required:true,
         trim:true
     },
-    requestDescription:{
+    contractDescription:{
         type:String,
         required:true,
         trim:true
+    },
+    paymentType:{
+        type:String,
+        required:true,
+        trim:true
+    },
+    hourlyRate:{
+        type:String,
+        default:"0"
+    },
+    fixedPrice:{
+        type:String,
+        default:"0"
+    },
+    startDate:{
+        type:Date,
+        required:true
     },
     requestImage:{
         type:String,
@@ -29,21 +46,10 @@ const requestSchema=new Schema({
     },
     status:{
         type: String,
-        enum: ['open', 'in-progress', 'completed', 'canceled'],
-        default: 'open',
+        enum: ['Not Accepted', 'In Progress', 'Completed', 'Rejected'],
+        default: 'Not Accepted',
     },
-    category: {
-        type: String,
-        required: true,
-    },
-    budget: {
-        type: Number,  // Budget as a number (e.g., $100)
-        required: true,
-    },
-    attachments: {
-        type: String,  // Array of file URLs or paths
-        default: "",
-    },
+    
 },{timestamps:true});
 
 
